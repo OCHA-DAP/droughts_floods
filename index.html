@@ -1,0 +1,321 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <title>Droughts and floods</title>
+  <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&display=swap"
+    rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Source Sans Pro', sans-serif;
+    }
+
+    .container {
+      margin-top: 50px;
+    }
+
+    .checkbox {
+      position: relative;
+      cursor: pointer;
+      appearance: none;
+      width: 80px;
+      height: 40px;
+      border-radius: 20px;
+      border: 2px solid #888888;
+      outline: none;
+      transition: 0.3s;
+      -webkit-transition: 0.3s;
+      -moz-transition: 0.3s;
+      -o-transition: 0.3s;
+      -ms-transition: 0.3s;
+    }
+
+    .checkbox::before {
+      content: "";
+      position: absolute;
+      height: 30px;
+      width: 30px;
+      border-radius: 50%;
+      background: #888888;
+      top: 3px;
+      left: 4px;
+      transition: 0.3s ease-in-out;
+    }
+
+    .checkbox:checked::before {
+      transform: translateX(37px);
+      background: #5DBCB3;
+    }
+
+    .checkbox:checked {
+      border-color: #5DBCB3;
+      outline: none;
+    }
+
+    input:active,
+    input:focus {
+      outline: none !important;
+      -moz-outline-style: none !important;
+    }
+
+    .x-axis text,
+    .y-axis text {
+      text-anchor: start;
+      font-family: 'Source Sans Pro', sans-serif;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .legendSize text,
+    .legendColor text {
+      font-weight: 400;
+    }
+
+    .tooltip {
+      position: absolute;
+      top: 0;
+      left: 0;
+      -moz-border-radius: 5px;
+      border-radius: 5px;
+      border: 1.5px solid #000;
+      background: #fff;
+      opacity: .9;
+      color: black;
+      padding: 10px;
+      z-index: 10;
+      max-width: 200px;
+      font-size: 12px;
+    }
+
+    .title {
+      font-size: 14px;
+      color: white;
+    }
+
+    circle:hover {
+      cursor: pointer;
+    }
+
+    .inline {
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 5px;
+      margin-left: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <label id="checkboxWrapper">
+          <span class="inline">All years</span>
+          <input id="click" type="checkbox" class="checkbox inline" />
+          <span class="inline">By year</span>
+        </label>
+        <div id="chart"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.14.2/d3.js"></script>
+  <script src="https://d3js.org/d3-array.v2.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+  <script src='./data/data.js'></script>
+  <script src='./tooltip.js'></script>
+
+  <script>
+
+    //******************
+    // Responsive setup
+    //******************
+    var windowWidth = $(window).width();
+    var windowHeight = $(window).height();
+    var viewportWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+    var viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+
+    $(window).resize(function () {
+      if (windowWidth != $(window).width() || windowHeight != $(window).height()) {
+        location.reload();
+        return;
+      }
+    });
+
+    var tooltip = floatingTooltip('tooltip', 200);
+    var width = $("#chart").parent().width();;
+    var height = 600;
+    var margin = { top: 30, right: 70, left: 30, bottom: 130 };
+
+    var disasters = disasters.sort((a, b) => parseFloat(a.year) - parseFloat(b.year));
+    var disasters2014 = disasters.filter(d => d.year >= 2014);
+    var yearGroups = d3.group(disasters2014, d => d.year);
+    var countryGroups = d3.group(disasters2014, d => d.country);
+
+    var groups = d3.group(disasters2014, d => d.year);
+    var countries = [...new Set(disasters2014.map(item => item.country))];
+    var years = [...new Set(disasters2014.map(item => item.year))].sort();
+
+    var x = d3.scaleBand().domain(years).range([margin.left, width - margin.right]);
+    var y = d3.scaleBand().domain(countries).range([height - margin.top - margin.bottom, 0]);
+    var r = d3.scaleSqrt().domain(d3.extent(disasters2014, d => d.total_deaths_affected)).range([3, 35]);
+    var color = d3.scaleOrdinal().domain(["Drought", "Flood"]).range(["#EAA69F", "#79AFE7"]);
+
+    var xAxis = g => g
+      .call(d3.axisTop(x)
+        .tickFormat(d => `${d}`))
+      .call(g => g.select('.domain').remove())
+      .call(g => g.selectAll('.tick line').remove())
+      .call(g => g.append('text')
+        .attr('x', innerWidth)
+        .attr('y', 20)
+        .attr('font-weight', 'bold')
+        .attr('text-anchor', 'end'))
+
+    var yAxis = yAxis = g => g
+      .call(d3.axisLeft(y).ticks(8))
+      .call(g => g.select('.domain').remove())
+      .call(g => g.selectAll('.tick line').remove())
+
+
+    var svg = d3.select("#chart").append("svg").attr("width", width).attr("height", height);
+
+    var force = d3.forceSimulation(disasters2014)
+      .force('charge', d3.forceManyBody().strength(0))
+      .force('x', d3.forceX().x(d => x(d.year)))
+      .force('y', d3.forceY((height - margin.top - margin.bottom) / 2))
+      .force('collision', d3.forceCollide().radius(d => r(d.total_deaths_affected) + 1))
+
+    var wrapper = svg.append('g')
+      .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+
+    // Add x-Axis
+    wrapper.append('g')
+      .attr('transform', `translate(-15,0)`) //not sure why I need to do this to have it align
+      .attr("class", "x-axis").call(xAxis);
+
+    var yAxisContainer = wrapper.append('g').attr("class", "y-axis");
+
+    var circles = wrapper.append('g')
+      .selectAll('circle')
+      .data(disasters2014)
+      .join('circle')
+      .attr('class', 'circles')
+      .attr('r', d => r(d.total_deaths_affected))
+      .attr('fill', d => color(d.disaster))
+      .attr('x', d => x(d.year))
+      .attr('y', d => y(d.country) + y.bandwidth() / 2)
+      .on('mouseover', showDetail)
+      .on('mouseout', hideDetail)
+
+
+    force.on('tick', () => {
+      circles
+        .transition()
+        .ease(d3.easeLinear)
+        .attr('cx', d => d.x + x.bandwidth() / 2)
+        .attr('cy', d => d.y);
+    })
+
+    //set up and draw legend
+    var legendSizeG = wrapper.append("g").attr("class", "legendSize").attr("transform", `translate(0,${height - 130})`);
+    var legendColorG = wrapper.append("g").attr("class", "legendColor").attr("transform", `translate(240,${height - 100})`);
+    var legendSize = d3.legendSize()
+      .scale(r)
+      .shape('circle')
+      .cells([10000, 100000, 1000000, 10000000])
+      .shapePadding(35)
+      .labelOffset(10)
+      .labelFormat(d3.format(".0f"))
+      .orient('horizontal')
+      .title("Number of people affected");
+
+
+    var legendColor = d3.legendColor()
+      .shapeWidth(40)
+      .orient('horizontal')
+      .scale(color);
+
+
+    wrapper.select(".legendSize")
+      .call(legendSize);
+
+    wrapper.select(".legendColor")
+      .call(legendColor);
+
+    d3.select(".legendSize").select(".legendCells").selectAll(".cell circle").attr("fill", "none").attr("stroke", "black")
+
+    var allYear = true;
+
+    d3.select("#click").on("click", function () {
+      redraw();
+    })
+
+
+    function redraw() {
+
+      if (allYear) {
+        allYear = false;
+        y.domain(countries);
+        y.range([height - margin.top - margin.bottom, 0]);
+        yAxisContainer.call(yAxis, y, countries)
+          .call(g => g.select('.domain').remove())
+          .call(g => g.selectAll('.tick line').remove());
+        // Update simulation
+        force.force('y', d3.forceY(d => y(d.country) + y.bandwidth() / 2));
+        force.alpha(1).restart();
+
+
+      } else {
+        allYear = true;
+        y.domain(['All']);
+        y.range([height - margin.top - margin.bottom, 0]);
+        // Update domain of y-Axis
+        yAxisContainer.call(yAxis, y, ['All'])
+          .call(g => g.select('.domain').remove())
+          .call(g => g.selectAll('.tick line').remove());
+        // Update simulation
+        force.force('y', d3.forceY((height - margin.top - margin.bottom) / 2));
+        force.alpha(1).restart();
+
+      }
+    }
+
+    function showDetail(d) {
+
+      d3.select(this)
+        .attr("stroke", "black")
+        .attr("stroke-width", "1px")
+        .style("cursor", "pointer");
+
+      var content = '<span class="title"><b>' + d.country + '</b></span><br><br><b>Total affected:</b> ' + d.total_affected + ' people<br><b>Total deaths:</b> ' + d.total_deaths + ' people';
+
+      d3.selectAll('.tooltip').style('background-image', '-webkit-linear-gradient(top,' + color(d.disaster) + ', ' + color(d.disaster) + ' 40%, transparent 40%, transparent 100%)');
+      d3.selectAll('.tooltip').style('background-image', 'linear-gradient(top,' + color(d.disaster) + ', ' + color(d.disaster) + ' 40%, transparent 40%, transparent 100%)');
+
+
+      tooltip.showTooltip(content, d3.event);
+    }
+
+    function hideDetail(d) {
+      // reset outline
+      d3.selectAll(".circles")
+        .attr("stroke", "none")
+        .attr("stroke-width", "0px");
+
+      tooltip.hideTooltip();
+    }
+
+
+
+  </script>
+</body>
+
+</html>
