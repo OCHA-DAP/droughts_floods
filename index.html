@@ -211,9 +211,9 @@
     })
 
     //set up and draw legend
-    var legendTitle = wrapper.append("text").text("Number of people affected").attr("transform", `translate(-25,${height - 140})`);
-    var legendSizeG = wrapper.append("g").attr("class", "legendSize").attr("transform", `translate(-10,${height - 110})`);
-    var legendColorG = wrapper.append("g").attr("class", "legendColor").attr("transform", `translate(240,${height - 80})`);
+    var legendTitle = wrapper.append("text").text("Number of people affected").attr("transform", `translate(-25,${height - 130})`);
+    var legendSizeG = wrapper.append("g").attr("class", "legendSize").attr("transform", `translate(-10,${height - 100})`);
+    var legendColorG = wrapper.append("g").attr("class", "legendColor").attr("transform", `translate(240,${height - 70})`);
     var legendSize = d3.legendSize()
       .scale(r)
       .shape('circle')
