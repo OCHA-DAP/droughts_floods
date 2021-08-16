@@ -138,7 +138,7 @@
 
     var tooltip = floatingTooltip('tooltip', 200);
     var width = $("#chart").parent().width();
-    var height = 700;
+    var height = 600;
     var margin = { top: 30, right: 70, left: 30, bottom: 130 };
     var numFormat = d3.format(",");
 
@@ -211,9 +211,9 @@
     })
 
     //set up and draw legend
-    var legendTitle = wrapper.append("text").text("Number of people affected").attr("transform", `translate(-25,${height - 120})`);
-    var legendSizeG = wrapper.append("g").attr("class", "legendSize").attr("transform", `translate(-10,${height - 90})`);
-    var legendColorG = wrapper.append("g").attr("class", "legendColor").attr("transform", `translate(240,${height - 60})`);
+    var legendTitle = wrapper.append("text").text("Number of people affected").attr("transform", `translate(-25,${height - 130})`);
+    var legendSizeG = wrapper.append("g").attr("class", "legendSize").attr("transform", `translate(-10,${height - 100})`);
+    var legendColorG = wrapper.append("g").attr("class", "legendColor").attr("transform", `translate(240,${height - 70})`);
     var legendSize = d3.legendSize()
       .scale(r)
       .shape('circle')
