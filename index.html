@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-  <title>Droughts and floods</title>
+  <title>Droughts and Floods</title>
   <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
   <style>
@@ -87,6 +87,7 @@
       color: #000;
       font-size: 16px;
       font-weight: 600;
+      margin-bottom: 10px;
     }
 
     circle:hover {
@@ -287,7 +288,7 @@
         .attr("stroke-width", "1px")
         .style("cursor", "pointer");
 
-      var content = '<span class="title">' + d.country + '</span><br><br>Total affected: ' + numFormat(d.total_affected) + '<br>Total deaths: ' + numFormat(d.total_deaths);
+      var content = '<div class="title">' + d.country + '</div>Total affected: ' + numFormat(d.total_affected) + '<br>Total deaths: ' + numFormat(d.total_deaths);
 
       // d3.selectAll('.tooltip').style('background-image', '-webkit-linear-gradient(top,' + color(d.disaster) + ', ' + color(d.disaster) + ' 40%, transparent 40%, transparent 100%)');
       // d3.selectAll('.tooltip').style('background-image', 'linear-gradient(top,' + color(d.disaster) + ', ' + color(d.disaster) + ' 40%, transparent 40%, transparent 100%)');
