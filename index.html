@@ -6,22 +6,21 @@
   <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
   <title>Droughts and floods</title>
   <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Source Sans Pro', sans-serif;
+      font-size: 12px;
     }
 
     .checkbox {
       position: relative;
       cursor: pointer;
       appearance: none;
-      width: 80px;
-      height: 40px;
+      width: 53px;
+      height: 30px;
       border-radius: 20px;
-      border: 2px solid #888888;
+      border: 2px solid #888;
       outline: none;
       transition: 0.3s;
       -webkit-transition: 0.3s;
@@ -33,22 +32,20 @@
     .checkbox::before {
       content: "";
       position: absolute;
-      height: 30px;
-      width: 30px;
+      height: 20px;
+      width: 20px;
       border-radius: 50%;
-      background: #888888;
+      background: #888;
       top: 3px;
       left: 4px;
       transition: 0.3s ease-in-out;
     }
 
     .checkbox:checked::before {
-      transform: translateX(37px);
-      background: #5DBCB3;
+      transform: translateX(20px);
     }
 
     .checkbox:checked {
-      border-color: #5DBCB3;
       outline: none;
     }
 
@@ -72,24 +69,24 @@
     }
 
     .tooltip {
-      position: absolute;
-      top: 0;
+      background-color: #FFF;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,.3);
+      color: #000;
+      font-size: 14px;
       left: 0;
-      -moz-border-radius: 5px;
-      border-radius: 5px;
-      border: 1.5px solid #000;
-      background: #fff;
       opacity: .9;
-      color: black;
-      padding: 10px;
-      z-index: 10;
+      padding: 15px;
+      position: absolute;
       max-width: 200px;
-      font-size: 12px;
+      top: 0;
+      z-index: 10;
     }
 
     .title {
-      font-size: 14px;
-      color: white;
+      color: #000;
+      font-size: 16px;
+      font-weight: 600;
     }
 
     circle:hover {
@@ -148,6 +145,7 @@
     var width = $("#chart").parent().width();;
     var height = 600;
     var margin = { top: 30, right: 70, left: 30, bottom: 130 };
+    var numFormat = d3.format(",");
 
     var disasters = disasters.sort((a, b) => parseFloat(a.year) - parseFloat(b.year));
     var disasters2014 = disasters.filter(d => d.year >= 2014);
@@ -191,7 +189,6 @@
     var wrapper = svg.append('g')
       .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
-
     // Add x-Axis
     wrapper.append('g')
       .attr('transform', `translate(-15,0)`) //not sure why I need to do this to have it align
@@ -211,7 +208,6 @@
       .on('mouseover', showDetail)
       .on('mouseout', hideDetail)
 
-
     force.on('tick', () => {
       circles
         .transition()
@@ -221,17 +217,18 @@
     })
 
     //set up and draw legend
-    var legendSizeG = wrapper.append("g").attr("class", "legendSize").attr("transform", `translate(0,${height - 130})`);
-    var legendColorG = wrapper.append("g").attr("class", "legendColor").attr("transform", `translate(240,${height - 100})`);
+    var legendTitle = wrapper.append("text").text("Number of people affected").attr("transform", `translate(-25,${height - 140})`);
+    var legendSizeG = wrapper.append("g").attr("class", "legendSize").attr("transform", `translate(-10,${height - 110})`);
+    var legendColorG = wrapper.append("g").attr("class", "legendColor").attr("transform", `translate(240,${height - 80})`);
     var legendSize = d3.legendSize()
       .scale(r)
       .shape('circle')
       .cells([10000, 100000, 1000000, 10000000])
       .shapePadding(35)
-      .labelOffset(10)
-      .labelFormat(d3.format(".0f"))
+      .labelOffset(15)
+      .labelFormat(d3.format(","))
       .orient('horizontal')
-      .title("Number of people affected");
+      //.title("Number of people affected");
 
 
     var legendColor = d3.legendColor()
@@ -285,17 +282,15 @@
     }
 
     function showDetail(d) {
-
       d3.select(this)
         .attr("stroke", "black")
         .attr("stroke-width", "1px")
         .style("cursor", "pointer");
 
-      var content = '<span class="title"><b>' + d.country + '</b></span><br><br><b>Total affected:</b> ' + d.total_affected + ' people<br><b>Total deaths:</b> ' + d.total_deaths + ' people';
+      var content = '<span class="title">' + d.country + '</span><br><br>Total affected: ' + numFormat(d.total_affected) + '<br>Total deaths: ' + numFormat(d.total_deaths);
 
-      d3.selectAll('.tooltip').style('background-image', '-webkit-linear-gradient(top,' + color(d.disaster) + ', ' + color(d.disaster) + ' 40%, transparent 40%, transparent 100%)');
-      d3.selectAll('.tooltip').style('background-image', 'linear-gradient(top,' + color(d.disaster) + ', ' + color(d.disaster) + ' 40%, transparent 40%, transparent 100%)');
-
+      // d3.selectAll('.tooltip').style('background-image', '-webkit-linear-gradient(top,' + color(d.disaster) + ', ' + color(d.disaster) + ' 40%, transparent 40%, transparent 100%)');
+      // d3.selectAll('.tooltip').style('background-image', 'linear-gradient(top,' + color(d.disaster) + ', ' + color(d.disaster) + ' 40%, transparent 40%, transparent 100%)');
 
       tooltip.showTooltip(content, d3.event);
     }
