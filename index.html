@@ -137,7 +137,7 @@
     });
 
     var tooltip = floatingTooltip('tooltip', 200);
-    var width = $("#chart").parent().width();;
+    var width = $("#chart").parent().width();
     var height = 600;
     var margin = { top: 30, right: 70, left: 30, bottom: 130 };
     var numFormat = d3.format(",");
@@ -172,7 +172,6 @@
       .call(g => g.select('.domain').remove())
       .call(g => g.selectAll('.tick line').remove())
 
-
     var svg = d3.select("#chart").append("svg").attr("width", width).attr("height", height);
 
     var force = d3.forceSimulation(disasters2014)
@@ -186,7 +185,7 @@
 
     // Add x-Axis
     wrapper.append('g')
-      .attr('transform', `translate(-15,0)`) //not sure why I need to do this to have it align
+      .attr('transform', `translate(0,0)`) //not sure why I need to do this to have it align
       .attr("class", "x-axis").call(xAxis);
 
     var yAxisContainer = wrapper.append('g').attr("class", "y-axis");
