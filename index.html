@@ -185,7 +185,7 @@
 
     // Add x-Axis
     wrapper.append('g')
-      .attr('transform', `translate(0,0)`) //not sure why I need to do this to have it align
+      .attr('transform', `translate(-15,0)`) //not sure why I need to do this to have it align
       .attr("class", "x-axis").call(xAxis);
 
     var yAxisContainer = wrapper.append('g').attr("class", "y-axis");
@@ -221,15 +221,12 @@
       .shapePadding(35)
       .labelOffset(15)
       .labelFormat(d3.format(","))
-      .orient('horizontal')
-      //.title("Number of people affected");
-
+      .orient('horizontal');
 
     var legendColor = d3.legendColor()
       .shapeWidth(40)
       .orient('horizontal')
       .scale(color);
-
 
     wrapper.select(".legendSize")
       .call(legendSize);
