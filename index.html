@@ -18,8 +18,8 @@
       position: relative;
       cursor: pointer;
       appearance: none;
-      width: 53px;
-      height: 30px;
+      width: 42px;
+      height: 25px;
       border-radius: 20px;
       border: 2px solid #888;
       outline: none;
@@ -33,8 +33,8 @@
     .checkbox::before {
       content: "";
       position: absolute;
-      height: 20px;
-      width: 20px;
+      height: 15px;
+      width: 15px;
       border-radius: 50%;
       background: #888;
       top: 3px;
@@ -43,7 +43,7 @@
     }
 
     .checkbox:checked::before {
-      transform: translateX(20px);
+      transform: translateX(15px);
     }
 
     .checkbox:checked {
@@ -69,7 +69,7 @@
       font-weight: 400;
     }
 
-    .tooltip {
+/*    .tooltip {
       background-color: #FFF;
       border-radius: 8px;
       box-shadow: 0 0 8px rgba(0,0,0,.3);
@@ -84,9 +84,48 @@
       z-index: 10;
     }
 
+    .tooltip:before {
+      content:"\A";
+      border-style: solid;
+      border-width: 10px 15px 10px 0;
+      border-color: transparent #FFF transparent transparent;
+      position: absolute;
+      left: -15px;
+    }*/
+
+    .d3-tip {
+      line-height: 1;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.8);
+      color: #FFF;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 18px;
+    }
+
+    /* Creates a small triangle extender for the tooltip */
+    .d3-tip:after {
+      box-sizing: border-box;
+      display: inline;
+      font-size: 10px;
+      width: 100%;
+      line-height: 1;
+      color: rgba(0, 0, 0, 0.8);
+      content: "\25BC";
+      position: absolute;
+      text-align: center;
+    }
+
+    /* Style northward tooltips specifically */
+    .d3-tip.n:after {
+      margin: -2px 0 0 0;
+      top: 100%;
+      left: 0;
+    }
+
     .title {
-      color: #000;
-      font-size: 16px;
+      color: #FFF;
+      font-size: 14px;
       font-weight: 600;
       margin-bottom: 10px;
     }
@@ -118,7 +157,7 @@
   <script src="https://d3js.org/d3-array.v2.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
   <script src='./data/data.js'></script>
-  <script src='./tooltip.js'></script>
+  <script src='./d3-tip.js'></script>
 
   <script>
 
@@ -137,7 +176,6 @@
       }
     });
 
-    var tooltip = floatingTooltip('tooltip', 200);
     var width = $("#chart").parent().width();
     var height = 600;
     var margin = { top: 30, right: 70, left: 30, bottom: 130 };
@@ -191,6 +229,16 @@
 
     var yAxisContainer = wrapper.append('g').attr("class", "y-axis");
 
+    //init tooltip
+    var tool_tip = d3.tip()
+        .attr("class", "d3-tip")
+        .offset([-8, 0])
+        .html(function(d) {
+          var content = '<div class="title">' + d.country + '</div>Total affected: ' + numFormat(d.total_affected) + '<br>Total deaths: ' + numFormat(d.total_deaths);
+          return content;
+        });
+      svg.call(tool_tip);
+
     var circles = wrapper.append('g')
       .selectAll('circle')
       .data(disasters2014)
@@ -199,9 +247,10 @@
       .attr('r', d => r(d.total_deaths_affected))
       .attr('fill', d => color(d.disaster))
       .attr('x', d => x(d.year))
-      .attr('y', d => y(d.country) + y.bandwidth() / 2)
-      .on('mouseover', showDetail)
-      .on('mouseout', hideDetail)
+      .attr('y', d => y(d.country) + y.bandwidth() / 2)     
+      .on('mouseover', tool_tip.show)
+      .on('mouseout', tool_tip.hide);
+
 
     force.on('tick', () => {
       circles
@@ -245,7 +294,6 @@
 
 
     function redraw() {
-
       if (allYear) {
         allYear = false;
         y.domain(countries);
@@ -272,32 +320,6 @@
 
       }
     }
-
-    function showDetail(d) {
-      d3.select(this)
-        .attr("stroke", "black")
-        .attr("stroke-width", "1px")
-        .style("cursor", "pointer");
-
-      var content = '<div class="title">' + d.country + '</div>Total affected: ' + numFormat(d.total_affected) + '<br>Total deaths: ' + numFormat(d.total_deaths);
-
-      // d3.selectAll('.tooltip').style('background-image', '-webkit-linear-gradient(top,' + color(d.disaster) + ', ' + color(d.disaster) + ' 40%, transparent 40%, transparent 100%)');
-      // d3.selectAll('.tooltip').style('background-image', 'linear-gradient(top,' + color(d.disaster) + ', ' + color(d.disaster) + ' 40%, transparent 40%, transparent 100%)');
-
-      tooltip.showTooltip(content, d3.event);
-    }
-
-    function hideDetail(d) {
-      // reset outline
-      d3.selectAll(".circles")
-        .attr("stroke", "none")
-        .attr("stroke-width", "0px");
-
-      tooltip.hideTooltip();
-    }
-
-
-
   </script>
 </body>
 
