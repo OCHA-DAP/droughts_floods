@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
+      background-color: transparent;
       font-family: 'Source Sans Pro', sans-serif;
       font-size: 12px;
     }
@@ -154,7 +155,7 @@
     var x = d3.scaleBand().domain(years).range([margin.left, width - margin.right]);
     var y = d3.scaleBand().domain(countries).range([height - margin.top - margin.bottom, 0]);
     var r = d3.scaleSqrt().domain(d3.extent(disasters2014, d => d.total_deaths_affected)).range([3, 35]);
-    var color = d3.scaleOrdinal().domain(["Drought", "Flood"]).range(["#EAA69F", "#79AFE7"]);
+    var color = d3.scaleOrdinal().domain(["Drought", "Flood"]).range(["#66B0EC", "#F7A29C"]);
 
     var xAxis = g => g
       .call(d3.axisTop(x)
