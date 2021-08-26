@@ -24,6 +24,7 @@
       border: 2px solid #888;
       outline: none;
       transition: 0.3s;
+      -webkit-appearance: none;
       -webkit-transition: 0.3s;
       -moz-transition: 0.3s;
       -o-transition: 0.3s;
@@ -68,30 +69,6 @@
     .legendColor text {
       font-weight: 400;
     }
-
-/*    .tooltip {
-      background-color: #FFF;
-      border-radius: 8px;
-      box-shadow: 0 0 8px rgba(0,0,0,.3);
-      color: #000;
-      font-size: 14px;
-      left: 0;
-      opacity: .9;
-      padding: 15px;
-      position: absolute;
-      max-width: 200px;
-      top: 0;
-      z-index: 10;
-    }
-
-    .tooltip:before {
-      content:"\A";
-      border-style: solid;
-      border-width: 10px 15px 10px 0;
-      border-color: transparent #FFF transparent transparent;
-      position: absolute;
-      left: -15px;
-    }*/
 
     .d3-tip {
       line-height: 1;
@@ -178,7 +155,7 @@
 
     var width = $("#chart").parent().width();
     var height = 600;
-    var margin = { top: 30, right: 80, left: 30, bottom: 130 };
+    var margin = { top: 30, right: 70, left: 30, bottom: 130 };
     var numFormat = d3.format(",");
 
     var disasters = disasters.sort((a, b) => parseFloat(a.year) - parseFloat(b.year));
